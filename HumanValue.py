@@ -65,7 +65,7 @@ validation_labels = torch.tensor(validation_labels, dtype=torch.float32)
 train_masks = torch.tensor(train_masks)
 validation_masks = torch.tensor(validation_masks)
 
-#3)DataLoader for training and test dataset to iterate over batches of data
+#3 DataLoader for training and test dataset to iterate over batches of data
 #batches dimension = 16 to not overload GPU
 batch_size = 16
 train_data = TensorDataset(train_inputs,train_masks,train_labels)
@@ -211,10 +211,11 @@ tokenizer.save_pretrained(pt_save_directory)
 model.save_pretrained(pt_save_directory)
 df_human_metrics.to_csv('df_human_metrics.csv', index=False)
 df_global_metrics.to_csv('global_metrics.csv',index=False)  
-
+#questa porzione di codice è stata utilizzata in un altro foglio python per visualizzare risultati con le metriche salvate
+#riporto qui i grafici utilizzati per la visualizzazione delle metriche
 label_counts = df_labels.iloc[:, 1:].sum()
 
-# Stampa i conteggi delle label
+# label count
 for label, count in label_counts.items():
     print(f"Label: {label}, Count: {count}")
 result= pd.read_csv(r"C:\Users\39371\Desktop\UUU\HumanValue\HumanValue\HumanValue\df_human_metrics.csv", delimiter=',', index_col=False)
