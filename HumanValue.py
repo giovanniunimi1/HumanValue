@@ -1,10 +1,6 @@
 ### IDENTIFY HUMAN VALUES BEHIND THE ARGUMENT ###
-!pip install pandas
-!pip install scikit-learn
-!pip install transformers
-!pip install torch
-!pip install numpy
-#IMPORT
+#librerie utilizzate
+import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from transformers import BertTokenizer 
@@ -165,7 +161,7 @@ for epoch in range(epochs):
         logits = logits[0].to('cpu')
         label_ids = b_labels.to('cpu')
         #Risultato sul set di test
-        #Strato finale di decisione sui risultati
+        #Strato finale di decisione sui risultati tramite una sigmoid function
         sigmoid = torch.nn.Sigmoid()
         predictions = torch.sigmoid(logits)
         b_predictions = (predictions > 0.5).int()
@@ -215,3 +211,61 @@ tokenizer.save_pretrained(pt_save_directory)
 model.save_pretrained(pt_save_directory)
 df_human_metrics.to_csv('df_human_metrics.csv', index=False)
 df_global_metrics.to_csv('global_metrics.csv',index=False)  
+
+label_counts = df_labels.iloc[:, 1:].sum()
+
+# Stampa i conteggi delle label
+for label, count in label_counts.items():
+    print(f"Label: {label}, Count: {count}")
+result= pd.read_csv(r"C:\Users\39371\Desktop\UUU\HumanValue\HumanValue\HumanValue\df_human_metrics.csv", delimiter=',', index_col=False)
+result1=result[result['Epoch']==14]
+num_campioni = [1394,2306,464,307,2609,888,885,646,3392,2652,936,1953,330,621,2339,1258,3395,708,1090,1943]
+f1_score = result1['Precision'].tolist()
+labels = result1['Human Value'].tolist()
+precision_values=result1['Precision'].tolist()
+# Conversione delle precisioni in radianti
+
+precision_rad = [p * 2 * np.pi for p in precision_values]
+#GRAFICO PRECISION SCORE PER CLASS
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, polar=True)
+angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False).tolist()
+ax.plot(angles + angles[:1], precision_rad + precision_rad[:1], linewidth=2, color='cyan')
+ax.set_xticks(angles)
+ax.set_xticklabels(labels)
+ax.scatter(angles, precision_rad, color='cyan', s=50)
+for i, label in enumerate(labels):l
+    angle_rad = angles[i]
+    precision_rad_val = precision_rad[i]
+    x = angle_rad
+    y = precision_rad_val + 0.1  # Sposta leggermente l'etichetta sopra il punto
+    plt.text(x, y, f'{precision_values[i]:.2f}', ha='center', va='center')
+
+#2
+# Visualizzazione del grafico
+plt.show()
+plt.scatter(num_campioni, f1_score)
+plt.xlabel('Samples per Class')
+plt.ylabel('Precision')
+plt.title('Correlation between number of samples and F1')
+# Aggiunta delle etichette delle classi
+for i, label in enumerate(labels):
+    plt.annotate(label, (num_campioni[i], f1_score[i]), textcoords="offset points", xytext=(0,10), ha='center')
+# Visualizzazione del grafico
+plt.grid(True)
+plt.show()
+
+#3
+fig, ax1 = plt.subplots()
+ax1.bar(result1['Human Value'], result1['F1'], color='cyan')
+ax1.set_ylabel('F1')
+plt.xticks(rotation=70, fontsize=8)
+ax2 = ax1.twinx()
+ax2.plot(result1['Human Value'], result1['F1'], marker='o', color='blue')
+ax2.set_ylabel('F1', color='red')
+# Imposta i limiti dell'asse y tra 0 e 1
+ax1.set_ylim(0, 1)
+ax2.set_ylim(0, 1)
+ax1.set_xlabel('Human Value')
+plt.title('F1 for human value')
+plt.show()
